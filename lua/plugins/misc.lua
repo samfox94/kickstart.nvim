@@ -8,10 +8,10 @@ return {
     -- Detect tabstop and shiftwidth automatically
     'tpope/vim-sleuth',
   },
-  -- {
-  --   -- Powerful Git integration for Vim
-  --   'tpope/vim-fugitive',
-  -- },
+  {
+    -- Powerful Git integration for Vim
+    'tpope/vim-fugitive',
+  },
   -- {
   --   -- GitHub integration for vim-fugitive
   --   'tpope/vim-rhubarb',
@@ -40,5 +40,18 @@ return {
     config = function()
       require('colorizer').setup()
     end,
+  },
+  -- LSP Plugins
+  {
+    -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+    -- used for completion, annotations and signatures of Neovim apis
+    'folke/lazydev.nvim',
+    ft = 'lua',
+    opts = {
+      library = {
+        -- Load luvit types when the `vim.uv` word is found
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
   },
 }

@@ -22,7 +22,8 @@ return {
       vim.g.nord_disable_background = bg_transparent
       vim.cmd [[colorscheme nord]]
     end
+    vim.g.nord_uniform_diff_background = true
 
-    vim.keymap.set('n', '<leader>bg', toggle_transparency, { noremap = true, silent = true })
+    vim.keymap.set('n', '<leader>tb', toggle_transparency, { noremap = true, silent = true, desc = '[T]oggle [B]ackground Transparency' })
   end,
 }
