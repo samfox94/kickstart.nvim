@@ -9,7 +9,7 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 local opts = { noremap = true, silent = true }
 
 -- save file
-vim.keymap.set('n', '<C-s>', '<cmd> w <CR>', opts)
+vim.keymap.set({ 'n', 'i' }, '<C-s>', '<cmd> w <CR><Esc>', opts)
 
 -- save file without auto-formatting
 -- vim.keymap.set('n', '<leader>sn', '<cmd>noautocmd w <CR>', { noremap = true, silent = true, desc = '[S]ave with [N]o formatting' })
@@ -37,14 +37,14 @@ vim.keymap.set('n', '<Right>', ':vertical resize +2<CR>', opts)
 -- Buffers
 vim.keymap.set('n', '<Tab>', ':bnext<CR>', opts)
 vim.keymap.set('n', '<S-Tab>', ':bprevious<CR>', opts)
-vim.keymap.set('n', '<leader>x', ':bdelete!<CR>', { noremap = true, silent = true, desc = 'Close current buffer' }) -- close buffer
+vim.keymap.set('n', '<leader>x', ':bdelete!<CR>', { noremap = true, silent = true, desc = 'Close current buffer' })    -- close buffer
 vim.keymap.set('n', '<leader>nb', '<cmd> enew <CR>', { noremap = true, silent = true, desc = '[N]ew empty [B]uffer' }) -- new buffer
 
 -- Window management
-vim.keymap.set('n', '<leader>pv', '<C-w>v', { noremap = true, silent = true, desc = 'Split [P]ane [V]ertically' }) -- split window vertically
+vim.keymap.set('n', '<leader>pv', '<C-w>v', { noremap = true, silent = true, desc = 'Split [P]ane [V]ertically' })  -- split window vertically
 vim.keymap.set('n', '<leader>ph', '<C-w>s', { noremap = true, silent = true, desc = 'Split [P]ane [H]orizonally' }) -- split window horizontally
-vim.keymap.set('n', '<leader>pe', '<C-w>=', { noremap = true, silent = true, desc = 'Split [P]anes [E]qually' }) -- make split windows equal width & height
-vim.keymap.set('n', '<leader>xs', ':close<CR>', opts) -- close current split window
+vim.keymap.set('n', '<leader>pe', '<C-w>=', { noremap = true, silent = true, desc = 'Split [P]anes [E]qually' })    -- make split windows equal width & height
+vim.keymap.set('n', '<leader>xs', ':close<CR>', opts)                                                               -- close current split window
 
 -- Navigate between splits
 vim.keymap.set('n', '<C-k>', ':wincmd k<CR>', opts)
