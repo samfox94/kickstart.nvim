@@ -71,3 +71,74 @@ vim.keymap.set('v', 'p', '"_dP', opts)
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+local function tmux_pane_exists(pane_id)
+  if not pane_id or pane_id == '' then
+    return false
+  end
+  local panes = vim.fn.systemlist "tmux list-panes -F '#{pane_id}' 2>/dev/null"
+  for _, p in ipairs(panes) do
+    if p == pane_id then
+      return true
+    end
+  end
+  return false
+end
+
+local function tmux_pane_command(pane_id)
+  if not tmux_pane_exists(pane_id) then
+    return nil
+  end
+  return vim.fn.system('tmux display-message -p -t ' .. pane_id .. " '#{pane_current_command}'"):gsub('%s+$', '')
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'python',
+  callback = function()
+    vim.keymap.set({ 'n', 'i', 'v' }, '<F5>', function()
+      -- To return to Normal mode from Insert or Select mode using <C-c>
+      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-c>', true, false, true), 'n', true)
+      vim.cmd 'w'
+      local file = vim.fn.expand '%:p'
+
+      -- Detect venv used by Neovim
+      local venv = vim.fn.getenv 'VIRTUAL_ENV' or ''
+      local activate = ''
+      if venv ~= '' then
+        activate = "source '" .. venv .. "/bin/activate'; "
+      end
+
+      local pane_id = vim.g.python_run_pane_id
+
+      if not tmux_pane_exists(pane_id) then
+        ----------------------------------------------------------
+        -- First time: create pane, load zsh, activate venv, run script
+        ----------------------------------------------------------
+        local cmd = "tmux split-window -v -P -F '#{pane_id}' " ..
+        '"zsh -lc \'' ..
+        activate ..
+        'python3 ' .. file .. '; exec zsh -l\'"'                                                                                        -- First time: create pane, load zsh, activate venv, run script
+        ----------------------------------------------------------
+        local cmd = "tmux split-window -v -P -F '#{pane_id}' " ..
+        '"zsh -lc \'' .. activate .. 'python3 ' .. file .. '; exec zsh -l\'"'
+
+        local new_id = vim.fn.system(cmd):gsub('%s+$', '')
+        vim.g.python_run_pane_id = new_id
+        return
+      end
+
+      ----------------------------------------------------------
+      -- Pane exists: if python is running, stop it
+      ----------------------------------------------------------
+      local running_cmd = tmux_pane_command(pane_id)
+      if running_cmd == 'python' or running_cmd == 'python3' or running_cmd:match '^python' then
+        vim.fn.system('tmux send-keys -t ' .. pane_id .. ' C-c')
+      end
+
+      ----------------------------------------------------------
+      -- Re-run script with venv
+      ----------------------------------------------------------
+      vim.fn.system('tmux send-keys -t ' .. pane_id .. " '" .. activate .. 'python3 ' .. file .. "' C-m")
+    end, { buffer = true, silent = true })
+  end,
+})
